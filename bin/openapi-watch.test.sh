@@ -30,29 +30,42 @@ refuse() {
 q='`'
 
 cat >"$t/old.json" <<'JSON'
-{"info":{"title":"ARES 1.4.0"},"paths":{"/a":{"get":{}},"/b":{"get":{}}},
+{"info":{"title":"ARES 1.4.0","version":"1.4"},"servers":[{"url":"/rest"}],"paths":{"/a":{"get":{}},"/b":{"get":{}}},
  "components":{"schemas":{"S":{"type":"object"},"T":{"type":"string"}}}}
 JSON
 cat >"$t/reordered.json" <<'JSON'
-{"components":{"schemas":{"T":{"type":"string"},"S":{"type":"object"}}},
- "paths":{"/b":{"get":{}},"/a":{"get":{}}},"info":{"title":"ARES 1.4.0"}}
+{"components":{"schemas":{"T":{"type":"string"},"S":{"type":"object"}}},"servers":[{"url":"/rest"}],
+ "paths":{"/b":{"get":{}},"/a":{"get":{}}},"info":{"version":"1.4","title":"ARES 1.4.0"}}
 JSON
 cat >"$t/new.json" <<'JSON'
-{"info":{"title":"ARES 1.5.0"},"paths":{"/a":{"get":{"deprecated":true}},"/c":{"get":{}}},
- "components":{"schemas":{"S":{"type":"array"},"U":{"type":"string"}}}}
+{"info":{"title":"ARES 1.5.0","version":"1.5"},"servers":[{"url":"/rest/v2"}],
+ "paths":{"/a":{"get":{"deprecated":true}},"/c":{"get":{}}},
+ "components":{"schemas":{"S":{"type":"array"},"U":{"type":"string"}},"parameters":{"P":{}}}}
+JSON
+# Only the version and the description differ: nothing in paths or schemas moved.
+cat >"$t/version-only.json" <<'JSON'
+{"info":{"title":"ARES 1.4.0","version":"1.4.1","description":"new"},"servers":[{"url":"/rest"}],
+ "paths":{"/a":{"get":{}},"/b":{"get":{}}},"components":{"schemas":{"S":{"type":"object"},"T":{"type":"string"}}}}
 JSON
 
 refuse "the same document in another key order is unchanged" "$script" changed "$t/old.json" "$t/reordered.json"
 expect "an added path is a change" "$script" changed "$t/old.json" "$t/new.json"
 
 "$script" summary "$t/old.json" "$t/new.json" >"$t/summary.md"
-expect "the summary names the new version" grep -q "ARES 1.4.0 → ARES 1.5.0" "$t/summary.md"
+expect "the summary names the new title" grep -q "title: ARES 1.4.0 → ARES 1.5.0" "$t/summary.md"
+expect "the summary names the new version" grep -q "version: 1.4 → 1.5" "$t/summary.md"
 expect "the summary names an added path" grep -qF "paths added: ${q}/c${q}" "$t/summary.md"
 expect "the summary names a removed path" grep -qF "paths removed: ${q}/b${q}" "$t/summary.md"
 expect "the summary names a changed path" grep -qF "paths changed: ${q}/a${q}" "$t/summary.md"
 expect "the summary names an added schema" grep -qF "schemas added: ${q}U${q}" "$t/summary.md"
 expect "the summary names a removed schema" grep -qF "schemas removed: ${q}T${q}" "$t/summary.md"
 expect "the summary names a changed schema" grep -qF "schemas changed: ${q}S${q}" "$t/summary.md"
+expect "the summary names other keys that changed" grep -qF "other keys changed: ${q}servers${q}, ${q}components.parameters${q}" "$t/summary.md"
+
+"$script" summary "$t/old.json" "$t/version-only.json" >"$t/version.md"
+expect "a change of info.version alone is named" grep -q "version: 1.4 → 1.4.1" "$t/version.md"
+expect "a change elsewhere in info is named" grep -qF "info changed besides title and version: ${q}info${q}" "$t/version.md"
+refuse "a change of info.version alone names no title change" grep -q "title:" "$t/version.md"
 
 # curl serves $SERVED; gh logs its arguments, keeps the --body-file it was given and lists $OPEN as the open issue.
 mkdir "$t/bin"

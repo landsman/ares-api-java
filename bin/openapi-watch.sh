@@ -17,23 +17,31 @@ title="ares: the register's OpenAPI document changed"
 
 changed() { ! cmp -s <(jq -S . "$1") <(jq -S . "$2"); }
 
-# Every list is "added" or "removed" by name; a schema in both whose body differs is "changed".
+# Every list is "added" or "removed" by name; a path or schema in both whose body differs is "changed". What lies
+# outside paths and schemas is named by its key, so an issue never says only "something changed".
 summary() {
 	jq -rn --slurpfile old "$1" --slurpfile new "$2" '
-		def names(f): [$old[0], $new[0]] | map(f // {} | keys);
+		$old[0] as $o | $new[0] as $n
+		| def names(f): [$o, $n] | map(f // {} | keys);
 		def list(what; xs): if (xs | length) == 0 then empty else "- \(what): " + (xs | map("`\(.)`") | join(", ")) end;
-		($old[0].info.title) as $was | ($new[0].info.title) as $is
-		| names(.paths) as [$op, $np]
+		def line(what; f): if ($o | f) != ($n | f) then "- \(what): \($o | f) → \($n | f)" else empty end;
+		def differing(a; b; skip): [(a | keys) + (b | keys) | unique[] | select(skip | not) | select(a[.] != b[.])];
+		names(.paths) as [$op, $np]
 		| names(.components.schemas) as [$os, $ns]
-		| [ (if $was != $is then "- version: \($was) → \($is)" else empty end),
+		| [ line("title"; .info.title),
+		    line("version"; .info.version),
 		    list("paths added"; $np - $op),
 		    list("paths removed"; $op - $np),
-		    list("paths changed"; [$op[] | select(. as $p | $np | index($p)) | select($old[0].paths[.] != $new[0].paths[.])]),
+		    list("paths changed"; [$op[] | select(. as $p | $np | index($p)) | select($o.paths[.] != $n.paths[.])]),
 		    list("schemas added"; $ns - $os),
 		    list("schemas removed"; $os - $ns),
 		    list("schemas changed"; [$os[] | select(. as $s | $ns | index($s))
-		        | select($old[0].components.schemas[.] != $new[0].components.schemas[.])]) ]
-		| if length == 0 then "- only outside paths and schemas" else join("\n") end'
+		        | select($o.components.schemas[.] != $n.components.schemas[.])]),
+		    list("info changed besides title and version";
+		        if ($o.info | del(.title, .version)) != ($n.info | del(.title, .version)) then ["info"] else [] end),
+		    list("other keys changed"; differing($o; $n; . == "paths" or . == "components" or . == "info")
+		        + (differing($o.components // {}; $n.components // {}; . == "schemas") | map("components.\(.)"))) ]
+		| if length == 0 then "- nothing this summary names; see the diff after a refresh" else join("\n") end'
 }
 
 fetch() {
