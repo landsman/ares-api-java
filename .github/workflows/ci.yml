@@ -7,6 +7,8 @@ on:
     branches: [main]
     paths: &reads
       - 'modules/**'
+      # AresSpecTest reads the OpenAPI copy, so a refreshed one has to build.
+      - 'spec/**'
       - 'gradle/**'
       - '*.gradle.kts'
       - 'gradlew'

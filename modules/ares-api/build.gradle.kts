@@ -19,6 +19,14 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+// AresSpecTest holds the client and its fixtures to the register's OpenAPI document. Declared as an input, so a
+// refreshed copy runs the tests again instead of coming from the build cache.
+tasks.withType<Test>().configureEach {
+    val spec = rootProject.file("spec/ares-openapi.json")
+    inputs.file(spec).withPathSensitivity(PathSensitivity.NONE).withPropertyName("aresSpec")
+    systemProperty("ares.spec", spec.absolutePath)
+}
+
 java {
     withSourcesJar()
     withJavadocJar()
