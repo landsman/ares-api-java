@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Tells me when ARES changes its OpenAPI document, against the copy in .docs/ares-openapi.json.
+# Tells me when ARES changes its OpenAPI document, against the copy in spec/ares-openapi.json.
 #
 #   openapi-watch.sh changed <stored> <fetched>   exit 0 when the two differ, key order and whitespace aside
 #   openapi-watch.sh summary <stored> <fetched>   what changed, as Markdown: version, paths and schemas
@@ -12,7 +12,7 @@ set -euo pipefail
 
 dir="$(cd "$(dirname "$0")" && pwd)"
 url=${ARES_OPENAPI_URL:-https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/v3/api-docs}
-stored=${ARES_OPENAPI_STORED:-$dir/../.docs/ares-openapi.json}
+stored=${ARES_OPENAPI_STORED:-$dir/../spec/ares-openapi.json}
 title="ares: the register's OpenAPI document changed"
 
 changed() { ! cmp -s <(jq -S . "$1") <(jq -S . "$2"); }
@@ -56,7 +56,7 @@ body() {
     local changes
     changes=$(summary "$stored" "$1")
     cat <<MD
-ARES's [OpenAPI document]($url) is no longer the copy in \`.docs/ares-openapi.json\`.
+ARES's [OpenAPI document]($url) is no longer the copy in \`spec/ares-openapi.json\`.
 
 $changes
 
@@ -64,7 +64,7 @@ To have Claude handle it, comment on this issue with:
 
 \`\`\`\`markdown
 @claude ARES changed its OpenAPI document; this issue lists what moved. Run \`bin/openapi-watch.sh refresh\` and read
-\`git diff .docs/ares-openapi.json\`. Then decide, for each change, whether it touches what this library reads:
+\`git diff spec/ares-openapi.json\`. Then decide, for each change, whether it touches what this library reads:
 the endpoints \`ekonomicke-subjekty/{ico}\`, \`-nrpzs/{ico}\`, \`-rs/{ico}\` and \`-rzp/{ico}\`, and the fields
 \`AresClient\` maps (see .docs/ares-api.md). Where it does, change the client, its fixtures under
 modules/ares-api/src/test/resources/ares/ and its tests, the README and .docs/ares-api.md, so a renamed or removed

@@ -26,7 +26,7 @@ publish: ## build and publish the jar to GitHub Packages, as the release workflo
 publish-local: ## install the jar into ~/.m2, to try it in another project without a token
 	./gradlew publishToMavenLocal
 
-openapi: ## overwrite .docs/ares-openapi.json with ARES's OpenAPI document as it is today
+openapi: ## overwrite spec/ares-openapi.json with ARES's OpenAPI document as it is today
 	./bin/openapi-watch.sh refresh
 
 ##@ Code style

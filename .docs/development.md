@@ -22,8 +22,8 @@ a pre-release while it is 0.x. A version, once published, cannot be published ag
 
 [openapi-watch.yml](../.github/workflows/openapi-watch.yml) compares ARES's
 [OpenAPI document](https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/v3/api-docs) with
-[ares-openapi.json](ares-openapi.json) on the first of every month, and when they differ opens one issue, or updates
+[ares-openapi.json](../spec/ares-openapi.json) on the first of every month, and when they differ opens one issue, or updates
 the open one, listing the paths and schemas that changed. The issue ends with a prompt: commented on the issue, it
 has Claude refresh the copy, work out what of it this library reads, and open a pull request. By hand,
-`make openapi` refreshes the copy and `git diff .docs/ares-openapi.json` shows what moved. The copy is sorted by key
+`make openapi` refreshes the copy and `git diff spec/ares-openapi.json` shows what moved. The copy is sorted by key
 (`jq -S`), so only a real change shows in the diff.
