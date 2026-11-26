@@ -1,6 +1,6 @@
 # Installing
 
-The client, `cz.insuit:ares-api`, and its Spring Boot starter, `cz.insuit:ares-api-spring-boot-starter`, are on this repository's [GitHub Packages](https://github.com/landsman?tab=packages&repo_name=ares-java).
+The client, `cz.insuit:ares-api`, and its Spring Boot starter, `cz.insuit:ares-api-spring-boot-starter`, are on this repository's [GitHub Packages](https://github.com/landsman?tab=packages&repo_name=ares-api-java).
 
 **GitHub Packages asks for a token even for a public package**, with the `read:packages` scope, and while this
 repository is private, the token's account needs read access to it. It checks only the token: any non-empty user
@@ -19,7 +19,7 @@ gh auth refresh -h github.com -s read:packages
 repositories {
     mavenCentral()
     maven {
-        url = uri("https://maven.pkg.github.com/landsman/ares-java")
+        url = uri("https://maven.pkg.github.com/landsman/ares-api-java")
         credentials {
             username = providers.gradleProperty("gpr.user").orElse("gh").orNull
             password = providers.gradleProperty("gpr.key").orElse(gh("auth", "token")).orNull
@@ -57,7 +57,7 @@ fun gh(vararg args: String): Provider<String> =
 <repositories>
     <repository>
         <id>github-ares</id>
-        <url>https://maven.pkg.github.com/landsman/ares-java</url>
+        <url>https://maven.pkg.github.com/landsman/ares-api-java</url>
     </repository>
 </repositories>
 

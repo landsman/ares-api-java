@@ -1,4 +1,4 @@
-rootProject.name = "ares-java"
+rootProject.name = "ares-api-java"
 
 // What ships: the client, and the Spring Boot starter around it.
 include(

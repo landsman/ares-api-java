@@ -71,7 +71,7 @@ subprojects {
                             name = project.name
                             // Lazily: the module sets its description after this block has run.
                             description = provider { project.description }
-                            url = "https://github.com/landsman/ares-java"
+                            url = "https://github.com/landsman/ares-api-java"
                             licenses {
                                 license {
                                     name = "Apache License 2.0"
@@ -85,8 +85,8 @@ subprojects {
                                 }
                             }
                             scm {
-                                url = "https://github.com/landsman/ares-java"
-                                connection = "scm:git:https://github.com/landsman/ares-java.git"
+                                url = "https://github.com/landsman/ares-api-java"
+                                connection = "scm:git:https://github.com/landsman/ares-api-java.git"
                             }
                         }
                     }
@@ -94,7 +94,7 @@ subprojects {
                 repositories {
                     maven {
                         name = "GitHubPackages"
-                        url = uri("https://maven.pkg.github.com/landsman/ares-java")
+                        url = uri("https://maven.pkg.github.com/landsman/ares-api-java")
                         // Set by GitHub Actions; a release from a laptop is not the way this one is cut.
                         credentials {
                             username = System.getenv("GITHUB_ACTOR")
