@@ -2,6 +2,7 @@ package cz.insuit.ares;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -125,9 +126,8 @@ class AresSpecTest {
     @DisplayName("each fixture is checked, so a new one cannot be left out")
     void everyFixtureIsChecked() throws IOException {
         var listed = new ArrayList<String>();
-        try (var files = Files.list(Path.of(Objects.requireNonNull(AresSpecTest.class.getResource("/ares/company.json"))
-                        .toURI())
-                .getParent())) {
+        try (var files = Files.list(Path.of(
+                Objects.requireNonNull(AresSpecTest.class.getResource("/ares")).toURI()))) {
             files.map(f -> f.getFileName().toString())
                     .filter(f -> f.endsWith(".json"))
                     .forEach(listed::add);
@@ -143,7 +143,7 @@ class AresSpecTest {
     @DisplayName("the walk finds a field behind a $ref and an allOf, and misses one that is not there")
     void walk() {
         assertEquals("integer", typeOf(Objects.requireNonNull(at(response("subject"), "sidlo.psc"))));
-        assertEquals(null, at(response("subject"), "sidlo.noSuchField"));
+        assertNull(at(response("subject"), "sidlo.noSuchField"));
     }
 
     /** Recurses into objects and arrays; every name must exist where it is, and every value match its type. */
@@ -234,7 +234,11 @@ class AresSpecTest {
         return null;
     }
 
-    /** The type a schema declares, through {@code $ref} and {@code allOf}; an object when it only has properties. */
+    /**
+     * The type a schema declares, through {@code $ref} and {@code allOf}; an object when it only has properties.
+     * {@code unknown} means the walk does not understand the schema ({@code oneOf}, {@code anyOf}, a 3.1 type list):
+     * extend it here rather than loosen the check.
+     */
     private static String typeOf(JsonNode schema) {
         var resolved = deref(schema);
         if (resolved.path("type").isString()) {
