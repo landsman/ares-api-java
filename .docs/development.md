@@ -27,3 +27,9 @@ the open one, listing the paths and schemas that changed. The issue ends with a 
 has Claude refresh the copy, work out what of it this library reads, and open a pull request. By hand,
 `make openapi` refreshes the copy and `git diff spec/ares-openapi.json` shows what moved. The copy is sorted by key
 (`jq -S`), so only a real change shows in the diff.
+
+`AresSpecTest` holds the client to that copy: every field the client reads has to be in it with the type the client
+reads it as, and every fixture may hold only fields it has. So refreshing the copy runs the tests again, and a field
+ARES renamed or dropped fails one, naming it. It finds the copy through the `ares.spec` system property that
+Gradle sets, so run it through Gradle (`make test`, or an IDE that delegates to Gradle); without it every test in the
+class fails with `ExceptionInInitializerError`.
