@@ -14,11 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -106,17 +107,12 @@ class AresSpecTest {
         assertTrue(wrong.isEmpty(), () -> String.join("\n", wrong));
     }
 
+    static Stream<String> fixtureNames() {
+        return FIXTURES.keySet().stream().sorted();
+    }
+
     @ParameterizedTest
-    @ValueSource(
-            strings = {
-                "company.json",
-                "hospital.json",
-                "school.json",
-                "sole-trader.json",
-                "nrpzs.json",
-                "rs.json",
-                "rzp.json"
-            })
+    @MethodSource("fixtureNames")
     @DisplayName("a fixture holds only fields the document has, each of its type")
     void fixtures(String name) {
         var endpoint = Objects.requireNonNull(FIXTURES.get(name), name);
