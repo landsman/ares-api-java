@@ -2,9 +2,13 @@
 
 `ares-openapi.json` is ARES's [OpenAPI document](https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/v3/api-docs)
 as it was when this library was last checked against it, sorted by key (`jq -S`), so a diff shows only what really
-moved. The library does not read it: the client maps the JSON by hand, and the tests run on their own fixtures in
-[src/test/resources/ares/](../modules/ares-api/src/test/resources/ares/README.md). It is the baseline the
-comparison needs, since a change can only be found against what came before.
+moved. The shipped jar does not read it: the client maps the JSON by hand. Two things do:
+
+- **The monthly comparison**, below, which needs a baseline, since a change can only be found against what came
+  before.
+- **`AresSpecTest`**, which holds the client to it: every field the client reads has to be here with the type the
+  client reads it as, and every fixture in
+  [src/test/resources/ares/](../modules/ares-api/src/test/resources/ares/README.md) may hold only fields it has.
 
 ## The comparison
 
@@ -28,5 +32,5 @@ make openapi                     # overwrite ares-openapi.json with today's docu
 git diff spec/ares-openapi.json  # what moved
 ```
 
-Then change the client, its fixtures and its tests where a field it reads moved, and commit the refreshed copy in
-the same pull request. A copy refreshed without that review hides the change from the next comparison.
+`make build` then fails in `AresSpecTest` on any field the client reads that moved. Change the client, its fixtures
+and its tests to match, and commit the refreshed copy in the same pull request. A copy refreshed without that review hides the change from the next comparison.
