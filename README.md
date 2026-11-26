@@ -1,4 +1,4 @@
-# ares-java
+# ares-api-java
 
 A client for [ARES](https://ares.gov.cz/), the Czech register of economic subjects, for Java 21+ and Kotlin: a
 company's name, VAT number, legal form and registered seat by its IČO, the contacts the health and school registers
