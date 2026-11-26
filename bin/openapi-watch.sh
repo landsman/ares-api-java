@@ -89,7 +89,9 @@ report)
 	fi
 	body "$t/fetched.json" >"$t/body.md" || exit 1
 	# One issue, edited rather than duplicated, so a month of the same change is not a month of new issues.
-	n=$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number // empty')
+	# The search is fuzzy, so the title is compared exactly: an issue that only resembles it is left alone.
+	n=$(gh issue list --state open --search "\"$title\" in:title" --json number,title |
+		jq -r --arg title "$title" 'map(select(.title == $title)) | .[0].number // empty')
 	if [ -n "$n" ]; then gh issue edit "$n" --body-file "$t/body.md"; else gh issue create --title "$title" --body-file "$t/body.md"; fi
 	;;
 *)

@@ -67,7 +67,7 @@ expect "a change of info.version alone is named" grep -q "version: 1.4 → 1.4.1
 expect "a change elsewhere in info is named" grep -qF "info changed besides title and version: ${q}info${q}" "$t/version.md"
 refuse "a change of info.version alone names no title change" grep -q "title:" "$t/version.md"
 
-# curl serves $SERVED; gh logs its arguments, keeps the --body-file it was given and lists $OPEN as the open issue.
+# curl serves $SERVED; gh logs its arguments, keeps the --body-file it was given and answers `issue list` with $OPEN.
 mkdir "$t/bin"
 cat >"$t/bin/curl" <<'SH'
 #!/usr/bin/env bash
@@ -85,7 +85,7 @@ for a in "$@"; do
     if [ "$prev" = --body-file ]; then cp "$a" "$GH_LOG.body"; fi
     prev=$a
 done
-if [ "$1 $2" = "issue list" ]; then echo "${OPEN:-}"; fi
+if [ "$1 $2" = "issue list" ]; then echo "${OPEN:-[]}"; fi
 SH
 chmod +x "$t/bin/curl" "$t/bin/gh"
 export GH_LOG="$t/gh.log" ARES_OPENAPI_STORED="$t/old.json" PATH="$t/bin:$PATH"
@@ -95,15 +95,21 @@ SERVED="$t/reordered.json" "$script" report >/dev/null
 refuse "an unchanged document opens no issue" grep -q "issue create\|issue edit" "$GH_LOG"
 
 : >"$GH_LOG"
-SERVED="$t/new.json" OPEN="" "$script" report >/dev/null
+SERVED="$t/new.json" OPEN="[]" "$script" report >/dev/null
 expect "a change with no open issue opens one" grep -q "^issue create" "$GH_LOG"
 expect "the issue says what changed" grep -qF "paths added: ${q}/c${q}" "$GH_LOG.body"
 expect "the issue carries the prompt for Claude" grep -q "^@claude ARES changed its OpenAPI document" "$GH_LOG.body"
 
 : >"$GH_LOG"
-SERVED="$t/new.json" OPEN="7" "$script" report >/dev/null
+title="ares: the register's OpenAPI document changed"
+SERVED="$t/new.json" OPEN="[{\"number\":7,\"title\":\"$title\"}]" "$script" report >/dev/null
 expect "a change with an open issue edits that one" grep -q "^issue edit 7" "$GH_LOG"
 refuse "a change with an open issue opens no second one" grep -q "issue create" "$GH_LOG"
+
+: >"$GH_LOG"
+SERVED="$t/new.json" OPEN="[{\"number\":8,\"title\":\"$title, again\"}]" "$script" report >/dev/null
+refuse "an issue that only resembles the title is not edited" grep -q "^issue edit" "$GH_LOG"
+expect "an issue that only resembles the title gets one of its own" grep -q "^issue create" "$GH_LOG"
 
 refuse "a document that cannot be fetched fails the run" env SERVED="$t/missing.json" "$script" report
 
