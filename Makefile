@@ -7,7 +7,7 @@ help: ## show this help
 		/^[a-zA-Z0-9_.-]+:.*##/ { printf "  \033[36m%-22s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
 ##@ Build
-.PHONY: build test lock release publish publish-local
+.PHONY: build test lock release publish publish-local openapi
 build: ## check formatting, compile with error prone and nullaway, test, check declared dependencies and package the jar; TESTS_JDK=21 tests on that JDK
 	./gradlew build buildHealth $(if $(TESTS_JDK),-PtestsJdk=$(TESTS_JDK))
 
@@ -25,6 +25,9 @@ publish: ## build and publish the jar to GitHub Packages, as the release workflo
 
 publish-local: ## install the jar into ~/.m2, to try it in another project without a token
 	./gradlew publishToMavenLocal
+
+openapi: ## overwrite spec/ares-openapi.json with ARES's OpenAPI document as it is today
+	./bin/openapi-watch.sh refresh
 
 ##@ Code style
 .PHONY: format lint scripts-test

@@ -17,3 +17,13 @@ Only a tag releases: merging to `main` publishes nothing. `make release` asks fo
 patch, refuses one that exists or a checkout that is not a clean `origin/main`, tags, waits for
 [release.yml](../.github/workflows/release.yml) to publish the jar to GitHub Packages and writes the release page,
 a pre-release while it is 0.x. A version, once published, cannot be published again; the next fix is the next tag.
+
+## When ARES changes its API
+
+[openapi-watch.yml](../.github/workflows/openapi-watch.yml) compares ARES's
+[OpenAPI document](https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/v3/api-docs) with
+[ares-openapi.json](../spec/ares-openapi.json) on the first of every month, and when they differ opens one issue, or updates
+the open one, listing the paths and schemas that changed. The issue ends with a prompt: commented on the issue, it
+has Claude refresh the copy, work out what of it this library reads, and open a pull request. By hand,
+`make openapi` refreshes the copy and `git diff spec/ares-openapi.json` shows what moved. The copy is sorted by key
+(`jq -S`), so only a real change shows in the diff.
