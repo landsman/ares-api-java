@@ -30,4 +30,6 @@ has Claude refresh the copy, work out what of it this library reads, and open a 
 
 `AresSpecTest` holds the client to that copy: every field the client reads has to be in it with the type the client
 reads it as, and every fixture may hold only fields it has. So refreshing the copy runs the tests again, and a field
-ARES renamed or dropped fails one, naming it.
+ARES renamed or dropped fails one, naming it. It finds the copy through the `ares.spec` system property that
+Gradle sets, so run it through Gradle (`make test`, or an IDE that delegates to Gradle); without it every test in the
+class fails with `ExceptionInInitializerError`.
