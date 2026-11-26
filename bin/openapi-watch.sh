@@ -20,42 +20,42 @@ changed() { ! cmp -s <(jq -S . "$1") <(jq -S . "$2"); }
 # Every list is "added" or "removed" by name; a path or schema in both whose body differs is "changed". What lies
 # outside paths and schemas is named by its key, so an issue never says only "something changed".
 summary() {
-	jq -rn --slurpfile old "$1" --slurpfile new "$2" '
-		$old[0] as $o | $new[0] as $n
-		| def names(f): [$o, $n] | map(f // {} | keys);
-		def list(what; xs): if (xs | length) == 0 then empty else "- \(what): " + (xs | map("`\(.)`") | join(", ")) end;
-		def line(what; f): if ($o | f) != ($n | f) then "- \(what): \($o | f) → \($n | f)" else empty end;
-		def differing(a; b; skip): [(a | keys) + (b | keys) | unique[] | select(skip | not) | select(a[.] != b[.])];
-		names(.paths) as [$op, $np]
-		| names(.components.schemas) as [$os, $ns]
-		| [ line("title"; .info.title),
-		    line("version"; .info.version),
-		    list("paths added"; $np - $op),
-		    list("paths removed"; $op - $np),
-		    list("paths changed"; [$op[] | select(. as $p | $np | index($p)) | select($o.paths[.] != $n.paths[.])]),
-		    list("schemas added"; $ns - $os),
-		    list("schemas removed"; $os - $ns),
-		    list("schemas changed"; [$os[] | select(. as $s | $ns | index($s))
-		        | select($o.components.schemas[.] != $n.components.schemas[.])]),
-		    list("info changed besides title and version";
-		        if ($o.info | del(.title, .version)) != ($n.info | del(.title, .version)) then ["info"] else [] end),
-		    list("other keys changed"; differing($o; $n; . == "paths" or . == "components" or . == "info")
-		        + (differing($o.components // {}; $n.components // {}; . == "schemas") | map("components.\(.)"))) ]
-		| if length == 0 then "- nothing this summary names; see the diff after a refresh" else join("\n") end'
+    jq -rn --slurpfile old "$1" --slurpfile new "$2" '
+        $old[0] as $o | $new[0] as $n
+        | def names(f): [$o, $n] | map(f // {} | keys);
+        def list(what; xs): if (xs | length) == 0 then empty else "- \(what): " + (xs | map("`\(.)`") | join(", ")) end;
+        def line(what; f): if ($o | f) != ($n | f) then "- \(what): \($o | f) → \($n | f)" else empty end;
+        def differing(a; b; skip): [(a | keys) + (b | keys) | unique[] | select(skip | not) | select(a[.] != b[.])];
+        names(.paths) as [$op, $np]
+        | names(.components.schemas) as [$os, $ns]
+        | [ line("title"; .info.title),
+            line("version"; .info.version),
+            list("paths added"; $np - $op),
+            list("paths removed"; $op - $np),
+            list("paths changed"; [$op[] | select(. as $p | $np | index($p)) | select($o.paths[.] != $n.paths[.])]),
+            list("schemas added"; $ns - $os),
+            list("schemas removed"; $os - $ns),
+            list("schemas changed"; [$os[] | select(. as $s | $ns | index($s))
+                | select($o.components.schemas[.] != $n.components.schemas[.])]),
+            list("info changed besides title and version";
+                if ($o.info | del(.title, .version)) != ($n.info | del(.title, .version)) then ["info"] else [] end),
+            list("other keys changed"; differing($o; $n; . == "paths" or . == "components" or . == "info")
+                + (differing($o.components // {}; $n.components // {}; . == "schemas") | map("components.\(.)"))) ]
+        | if length == 0 then "- nothing this summary names; see the diff after a refresh" else join("\n") end'
 }
 
 fetch() {
-	local out=$1
-	curl -fsSL --retry 2 "$url" -o "$out.raw"
-	jq -S . "$out.raw" >"$out"
-	rm -f "$out.raw"
+    local out=$1
+    curl -fsSL --retry 2 "$url" -o "$out.raw"
+    jq -S . "$out.raw" >"$out"
+    rm -f "$out.raw"
 }
 
 body() {
-	# Assigned first: a jq failure inside the heredoc would not stop the script, and the issue would say nothing.
-	local changes
-	changes=$(summary "$stored" "$1")
-	cat <<MD
+    # Assigned first: a jq failure inside the heredoc would not stop the script, and the issue would say nothing.
+    local changes
+    changes=$(summary "$stored" "$1")
+    cat <<MD
 ARES's [OpenAPI document]($url) is no longer the copy in \`.docs/ares-openapi.json\`.
 
 $changes
@@ -80,22 +80,22 @@ changed) changed "${2:?stored}" "${3:?fetched}" ;;
 summary) summary "${2:?stored}" "${3:?fetched}" ;;
 refresh) fetch "$stored" ;;
 report)
-	t=$(mktemp -d)
-	trap 'rm -rf "$t"' EXIT
-	fetch "$t/fetched.json"
-	if ! changed "$stored" "$t/fetched.json"; then
-		echo "unchanged since the stored copy"
-		exit 0
-	fi
-	body "$t/fetched.json" >"$t/body.md" || exit 1
-	# One issue, edited rather than duplicated, so a month of the same change is not a month of new issues.
-	# The search is fuzzy, so the title is compared exactly: an issue that only resembles it is left alone.
-	n=$(gh issue list --state open --search "\"$title\" in:title" --json number,title |
-		jq -r --arg title "$title" 'map(select(.title == $title)) | .[0].number // empty')
-	if [ -n "$n" ]; then gh issue edit "$n" --body-file "$t/body.md"; else gh issue create --title "$title" --body-file "$t/body.md"; fi
-	;;
+    t=$(mktemp -d)
+    trap 'rm -rf "$t"' EXIT
+    fetch "$t/fetched.json"
+    if ! changed "$stored" "$t/fetched.json"; then
+        echo "unchanged since the stored copy"
+        exit 0
+    fi
+    body "$t/fetched.json" >"$t/body.md" || exit 1
+    # One issue, edited rather than duplicated, so a month of the same change is not a month of new issues.
+    # The search is fuzzy, so the title is compared exactly: an issue that only resembles it is left alone.
+    n=$(gh issue list --state open --search "\"$title\" in:title" --json number,title |
+        jq -r --arg title "$title" 'map(select(.title == $title)) | .[0].number // empty')
+    if [ -n "$n" ]; then gh issue edit "$n" --body-file "$t/body.md"; else gh issue create --title "$title" --body-file "$t/body.md"; fi
+    ;;
 *)
-	sed -n '2,8p' "$0" >&2
-	exit 2
-	;;
+    sed -n '2,8p' "$0" >&2
+    exit 2
+    ;;
 esac
