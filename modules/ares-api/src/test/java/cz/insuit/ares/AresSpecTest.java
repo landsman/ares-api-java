@@ -78,16 +78,16 @@ class AresSpecTest {
                 Map.entry("subject:seznamRegistraci.stavZdrojeNrpzs", "string"),
                 Map.entry("subject:seznamRegistraci.stavZdrojeRs", "string"),
                 Map.entry("subject:seznamRegistraci.stavZdrojeRzp", "string"),
-                // AresClient.contacts and primary
+                // AresClient.contacts and primary; it reads an e-mail as a string or the first of an array, at both
+                // endpoints
                 Map.entry("nrpzs:zaznamy", "array"),
                 Map.entry("nrpzs:zaznamy[].primarniZaznam", "boolean"),
-                Map.entry("nrpzs:zaznamy[].kontakty.email", "string"),
+                Map.entry("nrpzs:zaznamy[].kontakty.email", "string|array"),
                 Map.entry("nrpzs:zaznamy[].kontakty.telefon", "string"),
                 Map.entry("nrpzs:zaznamy[].kontakty.fax", "string"),
                 Map.entry("nrpzs:zaznamy[].kontakty.www", "string"),
                 Map.entry("rs:zaznamy[].primarniZaznam", "boolean"),
-                Map.entry("rs:zaznamy[].kontakty.email", "array"),
-                Map.entry("rs:zaznamy[].kontakty.email[]", "string"),
+                Map.entry("rs:zaznamy[].kontakty.email", "string|array"),
                 Map.entry("rs:zaznamy[].kontakty.telefon", "string"),
                 // AresClient.soleTrader
                 Map.entry("rzp:zaznamy[].primarniZaznam", "boolean"),
@@ -100,7 +100,7 @@ class AresSpecTest {
             var at = field.split(":", 2);
             var schema = at(response(at[0]), at[1]);
             var found = schema == null ? "missing" : typeOf(schema);
-            if (!type.equals(found)) {
+            if (!List.of(type.split("\\|", -1)).contains(found)) {
                 wrong.add(field + " is " + found + ", the client reads " + type);
             }
         });
