@@ -1,0 +1,7 @@
+{
+  "ico": "12345678",
+  "obchodniJmeno": "Jan Novák",
+  "pravniForma": "101",
+  "sidlo": { "kodStatu": "CZ", "nazevObce": "Brno", "psc": 1001 },
+  "seznamRegistraci": { "stavZdrojeRzp": "AKTIVNI" }
+}

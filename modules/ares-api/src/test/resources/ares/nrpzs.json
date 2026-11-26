@@ -1,0 +1,10 @@
+{
+  "icoId": "00023001",
+  "zaznamy": [
+    { "primarniZaznam": false, "kontakty": { "email": "pobocka@nemocnice.example" } },
+    {
+      "primarniZaznam": true,
+      "kontakty": { "email": "info@nemocnice.example", "telefon": "+420123456789", "www": "nemocnice.example" }
+    }
+  ]
+}

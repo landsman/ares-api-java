@@ -1,0 +1,9 @@
+{
+  "icoId": "00027383",
+  "zaznamy": [
+    {
+      "primarniZaznam": true,
+      "kontakty": { "email": ["skola@skola.example", "reditel@skola.example"], "telefon": "+420111222333" }
+    }
+  ]
+}

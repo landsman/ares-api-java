@@ -1,0 +1,27 @@
+{
+  "ico": "27074358",
+  "obchodniJmeno": "Asseco Central Europe, a.s.",
+  "dic": "CZ27074358",
+  "pravniForma": "121",
+  "datumVzniku": "2003-08-06",
+  "datumAktualizace": "2025-04-11",
+  "sidlo": {
+    "kodStatu": "CZ",
+    "nazevStatu": "Česká republika",
+    "nazevObce": "Praha",
+    "nazevUlice": "Budějovická",
+    "cisloDomovni": 778,
+    "cisloOrientacni": 3,
+    "cisloOrientacniPismeno": "a",
+    "psc": 14000,
+    "nazevMestskeCastiObvodu": "Praha 4",
+    "textovaAdresa": "Budějovická 778/3a, Michle, 14000 Praha 4"
+  },
+  "seznamRegistraci": {
+    "stavZdrojeVr": "AKTIVNI",
+    "stavZdrojeRes": "AKTIVNI",
+    "stavZdrojeRzp": "AKTIVNI",
+    "stavZdrojeNrpzs": "NEEXISTUJICI",
+    "stavZdrojeRs": "NEEXISTUJICI"
+  }
+}

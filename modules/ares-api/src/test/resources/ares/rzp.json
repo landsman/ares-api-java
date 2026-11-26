@@ -1,0 +1,9 @@
+{
+  "icoId": "12345678",
+  "zaznamy": [
+    {
+      "primarniZaznam": true,
+      "osobaPodnikatel": { "jmeno": "Jan", "prijmeni": "Novák", "datumNarozeni": "1994-03-17" }
+    }
+  ]
+}
