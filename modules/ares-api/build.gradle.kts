@@ -27,11 +27,6 @@ tasks.withType<Test>().configureEach {
     systemProperty("ares.spec", spec.absolutePath)
 }
 
-java {
-    withSourcesJar()
-    withJavadocJar()
-}
-
 tasks.jar {
     // Pinned, so a JPMS caller's `requires` does not change with the jar's file name.
     manifest { attributes("Automatic-Module-Name" to "cz.insuit.ares") }
