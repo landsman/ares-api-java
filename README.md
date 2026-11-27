@@ -3,7 +3,7 @@
 A client for [ARES](https://ares.gov.cz/), the Czech register of economic subjects, for Java 21+ and Kotlin: a
 company's name, VAT number, legal form and registered seat by its IČO, the contacts the health and school registers
 publish, and the person behind a sole trader's licence. Its only dependencies are Jackson 3 and JSpecify.
-Published on GitHub Packages, not Maven Central.
+Published on Maven Central.
 
 Written against ARES's public REST API, [Swagger UI](https://ares.gov.cz/swagger-ui/) and
 [OpenAPI document](https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/v3/api-docs). No key, no sign-up.
@@ -11,7 +11,7 @@ Written against ARES's public REST API, [Swagger UI](https://ares.gov.cz/swagger
 | Read | For |
 |---|---|
 | [How ARES behaves](.docs/ares-api.md) | what bites: which subjects have contacts, the numbers, the registrations |
-| [Installing](.docs/install.md) | the artifact on GitHub Packages, for Gradle and Maven |
+| [Installing](.docs/install.md) | the dependency line for Gradle and Maven |
 | [Development](.docs/development.md) | build, tests, releasing |
 
 ## Use

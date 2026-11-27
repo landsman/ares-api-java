@@ -15,8 +15,29 @@ reads; the build fails while it is stale.
 
 Only a tag releases: merging to `main` publishes nothing. `make release` asks for the tag, suggesting the next
 patch, refuses one that exists or a checkout that is not a clean `origin/main`, tags, waits for
-[release.yml](../.github/workflows/release.yml) to publish the jar to GitHub Packages and writes the release page,
-a pre-release while it is 0.x. A version, once published, cannot be published again; the next fix is the next tag.
+[release.yml](../.github/workflows/release.yml) to publish the jars to Maven Central and writes the release page,
+a pre-release while it is 0.x. **Central is immutable**: a version, once published, can never be replaced or
+deleted, and the next fix is the next tag. A `-rc` tag (`v0.2.0-rc1`) tries the pipeline without taking a real
+version number.
+
+Up to 0.1.1 releases went to GitHub Packages, and stay there; from 0.2.0 on only Central has them.
+
+### Maven Central, set up once
+
+The `cz.insuit` namespace on the [Central Portal](https://central.sonatype.com/), its Portal user token and the
+release signing key are shared with the other `cz.insuit` libraries; how each was made is in
+[fio-api-java's development notes](https://github.com/landsman/fio-api-java/blob/main/.docs/development.md#maven-central-set-up-once).
+This repository only needs the four secrets, each value from 1Password, typed when asked:
+
+```sh
+gh secret set MAVEN_CENTRAL_USERNAME -R landsman/ares-api-java
+gh secret set MAVEN_CENTRAL_PASSWORD -R landsman/ares-api-java
+gh secret set SIGNING_KEY -R landsman/ares-api-java            # the armored secret key
+gh secret set SIGNING_KEY_PASSWORD -R landsman/ares-api-java
+```
+
+Without the signing key the build still publishes to `~/.m2` (`make publish-local`), unsigned; Central refuses
+an unsigned upload, so a release without the secrets fails at the Portal's validation, before anything is public.
 
 ## When ARES changes its API
 
